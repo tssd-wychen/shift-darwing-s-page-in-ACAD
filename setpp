@@ -1,0 +1,24 @@
+(defun c:tt ()
+
+  (defun SS2NDFLTR (ss filter);选择集二次过滤
+    (vl-cmdf "select" ss "")
+    (ssget "p" filter)
+  )
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (setq ss (ssget))
+  (setq vartxtlst (list "ss1" "ss2" "ss3")
+	dxfindex  (list 8)
+        filterlst (list "WAKU,PRINT")
+  )
+  (setq filterlst (mapcar 'cons dxfindex filterlst))
+  (mapcar (function (lambda (x y) (set x (SS2NDFLTR ss y))))
+    (mapcar 'read vartxtlst)
+    filterlst
+  )
+)
+;(setq ss1 '(1 2))
+;(setq ss2 '(2 3))
+;(setq ss3 '(3 4))
+;(setq vartxtlst (list "ss1" "ss2" "ss3"))
+;(setq filterlst (mapcar 'read (list "+" "-" "rem")))
+;(mapcar '(lambda(x y u)(set x (eval (cons y u)))) z filterlst (mapcar 'eval (mapcar 'read vartxtlst)))
