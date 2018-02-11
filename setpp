@@ -1,4 +1,4 @@
-(defun c:tt ()
+;(defun c:tt ()
 
   (defun SS2NDFLTR (ss filter);选择集二次过滤
     (vl-cmdf "select" ss "")
@@ -22,3 +22,4 @@
 ;(setq vartxtlst (list "ss1" "ss2" "ss3"))
 ;(setq filterlst (mapcar 'read (list "+" "-" "rem")))
 ;(mapcar '(lambda(x y u)(set x (eval (cons y u)))) z filterlst (mapcar 'eval (mapcar 'read vartxtlst)))
+;http://bbs.mjtd.com/thread-93264-2-1.html
