@@ -109,7 +109,7 @@
     basenlst
   )
   (defun CONSBPT(basenlst pgplst)
-    (setq pgfenlst (mapcar '(lambda(x)(car (reverse x))) basenlst))
+    (setq pgfenlst (mapcar 'cdr basenlst));这里通用时需注意考虑
     (foreach pgfen pgfenlst
       (setq pgfpty (entget pgfen))
       (setq pgbd (mapcar 'cdr (FIND_MULTI_PTY pgfpty 10)));page bound
@@ -128,35 +128,22 @@
   (mapcar 'set (list 'pgfrenlist 'pgnoenlist 'pgbptlist) baseenlist)
   (setq pgfrenlist (CONSPGNO pgfrenlist pgnoenlist))
   (setq baseenlist (CONSBPT pgfrenlist pgbptlist))
-  baseenlist
-  (setq blankpg (assoc -1 baseenlist))
-  (setq baseenlist (vl-remove blankpg baseenlist))
-  (setq mxpgno (apply 'max (mapcar 'car baseenlist)))
-  (setq mnpgno (apply 'min (mapcar 'car baseenlist)))
-  (setq countpg mxpgno)
+  (setq baseenlist (vl-sort baseenlist '(lambda(x1 x2)(> (car x1) (car x2)))))
+ 
   (setq pgctfilter '((-4 . "<not") (8 . "WAKU,Page No,PRINT") (-4 . "not>")))
-  (while (>= countpg mnpgno)
-    (if (= countpg mxpgno)
+  (foreach pagebase_i baseenlist
+    (setq pagebase_i+1 (cadr (member pagebase_i baseenlist)))
+    (if pagebase_i+1
       (progn
-        (setq pgframe (cadr (assoc countpg baseenlist)))
-        (setq pgframepty (entget pgframe))
-        (setq pgfptlst (FIND_MULTI_PTY pgframepty 10))
-        (setq pgfptlst (mapcar '(lambda(ptx)(trans ptx pgframe 1)) pgfptlst))
-        (setq pgctss (ssget "WP" pgfptlst pgctfilter))
-        (setq stbpt (car (reverse (assoc countpg baseenlist)))
-  	      spbpt (car (reverse blankpg))
-        )
-        (command "move" pgctss stbpt spbpt "")
+        (setq pgben_i+1 (cadr pagebase_i+1))
+        (setq pgbpty_i+1 (entget pgben_i+1))
+        (setq pgbd (mapcar 'cdr (FIND_MULTI_PTY pgbpty_i+1 10)))
+        (setq pgbdsel (mapcar '(lambda(ptx)(trans ptx pgfen 1)) pgbd))
+        (setq pgbss_i+1 (ssget "WP" pgbdsel pgctfilter))
+        (setq pst (caddr pagebase_i+1))
+        (setq pfn (caddr pagebase_i))
+        (command "MOVE" pgbss_i+1 pst pfn "")
       )
     )
-    (setq pgframe (cadr (assoc countpg baseenlist)))
-    (setq pgframepty (entget pgframe))
-    (setq pgfptlst (FIND_MULTI_PTY pgframepty 10))
-    (setq pgfptlst (mapcar '(lambda(ptx)(trans ptx pgframe 1)) pgfptlst))
-    (setq pgctss (ssget "WP" pgfptlst pgctfilter))
-    (setq stbpt (car (reverse (assoc countpg baseenlist)))
-  	      spbpt (car (reverse (assoc (1+ countpg) baseenlist)))
-    )
-    (command "move" pgctss stbpt spbpt "")
   )
 )
