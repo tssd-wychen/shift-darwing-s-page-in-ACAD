@@ -90,7 +90,8 @@
       (setq pgbpty (entget basen))
       (setq pgbd (mapcar 'cdr (FIND_MULTI_PTY pgbpty 10)));page bound
       (setq pgbdsel (mapcar '(lambda(ptx)(trans ptx basen 1)) pgbd))
-      (setq pgbdsel (vl-sort pgbdsel '(lambda(p1 p2)(> (cadr p1)(cadr p2)))))
+
+(setq pgbdsel (vl-sort pgbdsel '(lambda(p1 p2)(> (cadr p1)(cadr p2)))))
       (setq upppgbd (list (car pgbdsel)(cadr pgbdsel)))
       (setq pgbbptlst (mapcar 'car pgbenlst))
       (setq fitpgbbpt (ESTI_LIN_PTS upppgbd pgbbptlst))
@@ -128,8 +129,10 @@
   (mapcar 'set (list 'pgfrenlist 'pgnoenlist 'pgbptlist) baseenlist)
   (setq pgfrenlist (CONSPGNO pgfrenlist pgnoenlist))
   (setq baseenlist (CONSBPT pgfrenlist pgbptlist))
-  (while (wcmatch (rtos (getreal "determine left shift{to delete a page} or right shift{to spare a page}")) "0,1"))
-  (setq baseenlist (vl-sort baseenlist '(lambda(x1 x2)(> (car x1) (car x2)))));right shift -> use > and left shift -> use <
+  (setq enum_mode '((0 . ">")(1. "<")))
+  (while (wcmatch (rtos (setq modei (getint "determine left shift{to delete a page}{1} or right shift{to spare a page}{0}")) 2 0) "0,1"))
+  (setq baseenlist (vl-sort baseenlist '(lambda(x1 x2)(eval (list (read (cdr (assoc modei enum_mode))) (car x1) (car x2))))))
+  ;right shift -> use > and left shift -> use <
  
   (setq pgctfilter '((-4 . "<not") (8 . "WAKU,Page No,PRINT") (-4 . "not>")))
   (foreach pagebase_i baseenlist
